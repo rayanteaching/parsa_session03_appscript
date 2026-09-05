@@ -1,0 +1,16 @@
+{
+  "attemptPolicy": {
+    "mode": "first_official_then_practice",
+    "practiceAttempts": "unlimited",
+    "officialAttempt": "first_completed",
+    "practiceMayChangeOfficialGrade": false
+  },
+  "repositoryWritePolicy": {
+    "defaultBranch": "main",
+    "directWritesToDefaultBranchAllowed": false,
+    "writeBranchPrefixes": ["task/", "fix/", "harness/"],
+    "explicitBranchRequiredForRemoteWrites": true,
+    "documentationChangesExempt": false,
+    "bootstrapException": "owner-approved initial README commit only"
+  }
+}

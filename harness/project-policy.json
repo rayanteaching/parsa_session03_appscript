@@ -10,12 +10,7 @@
     "directWritesToDefaultBranchAllowed": false,
     "writeBranchPrefixes": ["task/", "fix/", "harness/"],
     "explicitBranchRequiredForRemoteWrites": true,
-    "documentationChangesExempt": false
-  },
-  "sessionIsolation": {
-    "sessionKey": "PARSA_S03",
-    "reusePriorSessionRuntimeIds": false,
-    "publicRepository": true,
-    "studentPrivateDataAllowedInRepo": false
+    "documentationChangesExempt": false,
+    "bootstrapException": "owner-approved initial README commit only"
   }
 }

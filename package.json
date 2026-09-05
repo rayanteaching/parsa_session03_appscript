@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "prewrite": "node scripts/prewrite-guard.mjs",
+    "bootstrap:clasp": "node scripts/bootstrap-clasp.mjs",
     "test": "node scripts/validate.mjs && node scripts/validate-bidi.mjs",
     "verify": "node scripts/validate.mjs && node scripts/validate-bidi.mjs"
   }

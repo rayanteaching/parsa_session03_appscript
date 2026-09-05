@@ -13,6 +13,8 @@ Before changing code:
 5. inspect task-relevant files;
 6. run available verification before claiming readiness.
 
+Before any Apps Script provisioning, push, rollback, or deployment operation, also read `docs/APPS_SCRIPT_WORKFLOW.md`.
+
 ## Branch and review rules
 
 - `main` is trusted; do not make implementation or documentation changes directly on `main` after repository bootstrap.
@@ -25,11 +27,23 @@ Before changing code:
 - Documentation-only changes are not exempt.
 - Keep scope narrow and review the actual diff before merge.
 
+## Canonical Git-to-Apps-Script workflow
+
+- GitHub is the source of truth for tracked source.
+- The only normal bridge from GitHub source to Apps Script is a verified **local clone of this repository** using `clasp`.
+- Do not create the Session 03 Apps Script source manually in the Apps Script editor and do not edit tracked source there as a normal workflow.
+- A new Session 03 Apps Script project must be provisioned from a clean local clone of trusted `main` with `npm run bootstrap:clasp` after the foundation PR is verified and merged.
+- `clasp create` is a remote mutation and requires explicit owner intent for that project-creation operation.
+- Session 03 `.clasp.json` is local-only and must not be committed to this public repository.
+- `clasp create` can write the manifest; the bootstrap procedure must restore the tracked `appsscript.json` before any push.
+
 ## Apps Script mutation boundaries
 
 - Never run `clasp push` without explicit owner instruction for that operation.
 - Never create/update the student-facing production deployment without explicit owner instruction.
 - Before an approved `clasp push`, identify a known-good Git commit SHA for rollback.
+- Source changes must flow GitHub -> local clone -> `clasp` -> Apps Script, never Apps Script editor -> GitHub.
+- Apps Script UI may be used for runtime-only operations such as Script Properties, logs, authorization, and explicitly owner-run setup functions; it is not the source editor.
 
 ## Runtime configuration
 

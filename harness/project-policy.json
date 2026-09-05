@@ -10,7 +10,25 @@
     "directWritesToDefaultBranchAllowed": false,
     "writeBranchPrefixes": ["task/", "fix/", "harness/"],
     "explicitBranchRequiredForRemoteWrites": true,
-    "documentationChangesExempt": false,
-    "bootstrapException": "owner-approved initial README commit only"
+    "documentationChangesExempt": false
+  },
+  "appsScriptWorkflow": {
+    "sourceOfTruth": "github_repository",
+    "mutationBridge": "verified_local_clone_with_clasp",
+    "localCloneRequired": true,
+    "manualAppsScriptSourceEditingAllowed": false,
+    "manualAppsScriptProjectCreationAllowed": false,
+    "newProjectProvisioningCommand": "npm run bootstrap:clasp",
+    "claspCreateRequiresOwnerApproval": true,
+    "claspPushRequiresOwnerApproval": true,
+    "productionDeployRequiresOwnerApproval": true,
+    "claspConfigTracked": false,
+    "restoreTrackedManifestAfterCreate": true
+  },
+  "sessionIsolation": {
+    "sessionKey": "PARSA_S03",
+    "reusePriorSessionRuntimeIds": false,
+    "publicRepository": true,
+    "studentPrivateDataAllowedInRepo": false
   }
 }

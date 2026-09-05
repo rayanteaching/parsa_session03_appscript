@@ -12,16 +12,8 @@ try {
   fail(`cannot determine current Git branch: ${error.message}`);
 }
 
-if (!branch) {
-  fail('current Git branch is empty or detached; create/switch to a dedicated task branch before writing');
-}
-
-if (branch === 'main') {
-  fail('direct repository work on main is forbidden; create/switch to task/*, fix/*, or harness/* first');
-}
-
-if (!/^(task|fix|harness)\//.test(branch)) {
-  fail(`branch "${branch}" is not an approved write branch; use task/*, fix/*, or harness/*`);
-}
+if (!branch) fail('current Git branch is empty or detached; switch to a dedicated task branch before writing');
+if (branch === 'main') fail('direct repository work on main is forbidden; use task/*, fix/*, or harness/*');
+if (!/^(task|fix|harness)\//.test(branch)) fail(`branch "${branch}" is not approved for writes`);
 
 console.log(`PASS  repository write branch is safe: ${branch}`);

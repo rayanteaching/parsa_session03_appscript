@@ -56,3 +56,12 @@ Session 03 has its own repository, Apps Script project, Spreadsheet registration
 **Status:** ACCEPTED
 
 This repository is public. Never commit student email addresses, submission IDs, scores, submitted code, private feedback, credentials, Script Property values, or Spreadsheet IDs. Only generic application logic, lesson content, and non-sensitive harness documentation belong here.
+
+## HD-012 — Observe local CLI before version-sensitive mutations
+**Status:** ACCEPTED
+
+For first-time Apps Script provisioning, the installed `clasp` CLI is authoritative for command shape. Before creation, run `clasp --version` and `clasp create-script --help`. Do not infer syntax from chat history or remote documentation alone when local help is available.
+
+First-time remote project creation must not be hidden inside a Node/npm wrapper. A non-mutating preflight may verify repository state and the observed CLI, but the owner runs the direct create command explicitly.
+
+Session 03 is created as a `standalone` Apps Script project. Web App behavior is configured at deployment. Creation, source push, and production deployment remain separate approval gates.

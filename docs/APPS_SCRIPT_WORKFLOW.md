@@ -8,48 +8,49 @@ This document defines the only normal source-provisioning and deployment path fo
 
 Tracked source must not originate from manual edits in the Apps Script editor.
 
-## New Session 03 project provisioning
+## First-time provisioning guardrail
 
-Provision only after the Session 03 foundation has passed verification and has been merged to trusted `main`.
-
-On the owner workstation:
+Before any first-time Apps Script project creation, use the installed CLI as the authority for command shape:
 
 ```bash
-git clone https://github.com/rayanteaching/parsa_session03_appscript.git
-cd parsa_session03_appscript
-git switch main
-git pull --ff-only
-git status --short
-npm test
+clasp --version
+clasp create-script --help
 ```
 
-`git status --short` must be empty.
+Do not infer create syntax from chat history or remote documentation when local help is available. Record the observed version/help in the working session before issuing a create command.
 
-If `clasp` is not already authenticated for the intended Google account, authenticate it before provisioning.
+For Session 03, project creation is `standalone`. Web App behavior belongs to deployment. Do not depend on create-time `webapp` aliases even if another clasp version documents them.
 
-Then run:
+Run the non-mutating preflight first:
 
 ```bash
-npm run bootstrap:clasp
+npm run clasp:preflight
 ```
 
-The bootstrap script must:
+Preflight must only verify repo identity, trusted `main`, clean working tree, repository tests, installed clasp version/help, and absence of an existing `.clasp.json`. It must not create a remote project, push source, or deploy.
 
-1. verify this exact repository and trusted `main`;
-2. require a clean working tree;
-3. require `.clasp.json` to be absent before creation;
-4. run repository verification;
-5. execute `clasp create --type webapp --title "Parsa Session 03" --rootDir .`;
-6. restore the Git-tracked `appsscript.json` after `clasp create`;
-7. require the newly created `.clasp.json` to remain local and Git-ignored;
-8. show the local `clasp status` and leave the tracked working tree clean;
-9. stop without running `clasp push`.
+Remote creation is an explicit owner action and must be run directly, not hidden inside a wrapper. Use a temporary root directory so `create-script` cannot overwrite tracked source while it clones initial Apps Script files:
 
-Creating the project manually in the Apps Script UI is not the standard provisioning path.
+```bash
+rm -rf .clasp-bootstrap-tmp
+mkdir .clasp-bootstrap-tmp
+clasp create-script --type standalone --title "Parsa Session 03" --rootDir .clasp-bootstrap-tmp
+```
 
-## Why the manifest is restored
+After successful creation:
 
-`clasp create` writes the local project configuration and Apps Script manifest. This repository already owns the intended `appsscript.json`, so Git must restore the tracked manifest before source is pushed.
+1. inspect the created `.clasp.json` and confirm its `scriptId` points to the new Session 03 project;
+2. set its `rootDir` to `.` before the first source push;
+3. remove `.clasp-bootstrap-tmp`;
+4. run `clasp status`;
+5. require `git status --short` to remain clean;
+6. stop. Do not run `clasp push` yet.
+
+Session 03 `.clasp.json` is local-only and Git-ignored.
+
+## Why this guardrail exists
+
+A previous provisioning attempt embedded an assumed `clasp create --type webapp ...` command inside a Node wrapper. On the owner's Windows/Git Bash environment it failed first on process spawning and then on command parsing/type handling. The root problem was treating CLI syntax as static instead of observing the installed tool. The harness therefore separates environment observation, preflight, explicit remote creation, push, and deployment into distinct gates.
 
 ## Push gate
 
@@ -64,7 +65,7 @@ git rev-parse HEAD
 clasp status
 ```
 
-Confirm the local `.clasp.json` targets the newly created Session 03 project. Then wait for explicit owner authorization for that specific `clasp push`.
+Confirm the local `.clasp.json` targets the dedicated Session 03 Apps Script project. Then wait for explicit owner authorization for that specific `clasp push`.
 
 ## Runtime setup after approved push
 
@@ -73,8 +74,6 @@ Runtime-only setup is performed in the new Session 03 Apps Script project:
 - configure `STUDENT_EMAIL` and `TEACHER_EMAIL` in Script Properties;
 - run the explicit Results Spreadsheet setup/migration function;
 - perform the smoke test from `docs/RUNBOOK.md`.
-
-These runtime actions do not make the Apps Script editor a source of truth.
 
 ## Deployment gate
 

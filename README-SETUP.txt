@@ -8,33 +8,43 @@ PARSA SESSION 03 — SETUP
 
 GitHub repo -> local clone -> clasp -> Apps Script
 
-پروژه Session 03 را به‌صورت دستی در Apps Script Editor نساز و کدهای tracked را آنجا ویرایش نکن.
-ابتدا foundation باید با تست و PR وارد main شود.
+کدهای tracked را در Apps Script Editor ویرایش نکن.
 
 روی سیستم مالک پروژه:
 
-git clone https://github.com/rayanteaching/parsa_session03_appscript.git
-cd parsa_session03_appscript
 git switch main
 git pull --ff-only
 git status --short
 npm test
 
-اگر clasp برای حساب Google موردنظر login نشده، ابتدا authentication را انجام بده.
-سپس از ریشه همین repo اجرا کن:
+قبل از اولین اتصال Apps Script، syntax را حدس نزن. اول محیط واقعی را مشاهده کن:
 
-npm run bootstrap:clasp
+clasp --version
+clasp create-script --help
 
-این دستور:
-- صحت repo و branch main را چک می‌کند؛
-- working tree تمیز می‌خواهد؛
-- پروژه جدید Apps Script با عنوان Parsa Session 03 را از طریق clasp می‌سازد؛
-- .clasp.json محلی را ایجاد می‌کند؛
-- appsscript.json نسخه repo را بعد از clasp create برمی‌گرداند؛
-- target را بررسی می‌کند؛
-- هیچ clasp push انجام نمی‌دهد.
+سپس preflight غیرمخرب را اجرا کن:
 
-.clasp.json برای این repo عمومی local-only است و نباید commit شود.
+npm run clasp:preflight
+
+preflight فقط repo، branch، working tree، تست‌ها، نسخه/help محلی clasp و نبودن .clasp.json را بررسی می‌کند. هیچ Apps Script project نمی‌سازد، push نمی‌کند و deploy نمی‌کند.
+
+بعد از preflight موفق، owner ساخت remote project را مستقیم و قابل‌مشاهده اجرا می‌کند. Session 03 در مرحله create به‌صورت standalone ساخته می‌شود؛ Web App بودن مربوط به deployment است:
+
+rm -rf .clasp-bootstrap-tmp
+mkdir .clasp-bootstrap-tmp
+clasp create-script --type standalone --title "Parsa Session 03" --rootDir .clasp-bootstrap-tmp
+
+پوشه موقت باعث می‌شود فایل‌های اولیه‌ای که clasp هنگام create pull می‌کند روی source tracked پروژه overwrite نشوند.
+
+بعد از ساخت موفق:
+- .clasp.json را بررسی کن و مطمئن شو scriptId متعلق به Session 03 جدید است؛
+- rootDir در .clasp.json را قبل از push روی . تنظیم کن؛
+- .clasp-bootstrap-tmp را حذف کن؛
+- clasp status را اجرا کن؛
+- git status --short باید تمیز بماند؛
+- توقف کن و clasp push نزن.
+
+.clasp.json local-only و Git-ignored است.
 
 ========================================
 1) Push اولیه
@@ -70,8 +80,6 @@ TEACHER_EMAIL
 - Code Repair = 20
 - Final Coding = 20
 - Total = 100
-
-بعد از تصحیح دستی، ManualDebugScore و ManualCodingScore و در صورت نیاز TeacherFeedback پر می‌شوند و sendFinalEmailForLatestSubmission() اجرا می‌شود.
 
 ========================================
 4) Deploy

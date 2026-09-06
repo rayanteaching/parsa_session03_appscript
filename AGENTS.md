@@ -5,7 +5,6 @@ This repository uses a lightweight harness. Treat repository state and current t
 ## Re-entry order
 
 Before changing code:
-
 1. inspect current branch, recent log, and diff;
 2. read `docs/STATUS.md` when present;
 3. read `docs/HARNESS_DECISIONS.md` when present;
@@ -19,31 +18,29 @@ Before any Apps Script provisioning, push, rollback, or deployment operation, al
 
 - `main` is trusted; do not make implementation or documentation changes directly on `main` after repository bootstrap.
 - Use `task/...`, `fix/...`, or `harness/...` branches.
-- Before ANY repository write through GitHub tools, local Git, Codex, or another agent:
-  1. verify the intended target branch exists and is not `main`;
-  2. explicitly pass that non-main branch to the write operation;
-  3. omission of branch/ref is forbidden when a write tool would default to `main`;
-  4. if a write path cannot target a non-main branch, stop instead of writing.
+- Every repository write must explicitly target a non-main branch.
 - Documentation-only changes are not exempt.
 - Keep scope narrow and review the actual diff before merge.
 
 ## Canonical Git-to-Apps-Script workflow
 
 - GitHub is the source of truth for tracked source.
-- The only normal bridge from GitHub source to Apps Script is a verified **local clone of this repository** using `clasp`.
-- Do not create the Session 03 Apps Script source manually in the Apps Script editor and do not edit tracked source there as a normal workflow.
-- A new Session 03 Apps Script project must be provisioned from a clean local clone of trusted `main` with `npm run bootstrap:clasp` after the foundation PR is verified and merged.
-- `clasp create` is a remote mutation and requires explicit owner intent for that project-creation operation.
-- Session 03 `.clasp.json` is local-only and must not be committed to this public repository.
-- `clasp create` can write the manifest; the bootstrap procedure must restore the tracked `appsscript.json` before any push.
+- The only normal bridge from GitHub source to Apps Script is a verified local clone using `clasp`.
+- Do not edit tracked source in the Apps Script editor.
+- Before first project provisioning, observe the installed CLI with BOTH `clasp --version` and `clasp create-script --help`.
+- Never infer `clasp` syntax from chat history or remote documentation alone when local CLI help is available.
+- Never hide first-time remote project creation inside a wrapper script. The owner runs the exact direct `clasp create-script ...` command after preflight.
+- For this project, create the Apps Script project as `standalone`; Web App behavior is configured at deployment, not by relying on create-time type aliases.
+- Run `npm run clasp:preflight` before first-time creation. Preflight must not create, push, or deploy anything.
+- Session 03 `.clasp.json` is local-only and must not be committed.
 
 ## Apps Script mutation boundaries
 
+- `clasp create-script` requires explicit owner intent for that creation operation.
 - Never run `clasp push` without explicit owner instruction for that operation.
 - Never create/update the student-facing production deployment without explicit owner instruction.
 - Before an approved `clasp push`, identify a known-good Git commit SHA for rollback.
-- Source changes must flow GitHub -> local clone -> `clasp` -> Apps Script, never Apps Script editor -> GitHub.
-- Apps Script UI may be used for runtime-only operations such as Script Properties, logs, authorization, and explicitly owner-run setup functions; it is not the source editor.
+- Source changes flow GitHub -> local clone -> clasp -> Apps Script, never Apps Script editor -> GitHub.
 
 ## Runtime configuration
 

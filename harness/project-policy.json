@@ -18,12 +18,19 @@
     "localCloneRequired": true,
     "manualAppsScriptSourceEditingAllowed": false,
     "manualAppsScriptProjectCreationAllowed": false,
-    "newProjectProvisioningCommand": "npm run bootstrap:clasp",
+    "claspEnvironmentMustBeObservedBeforeProvisioning": true,
+    "requiredClaspObservations": ["clasp --version", "clasp create-script --help"],
+    "provisioningMode": "direct_owner_command_after_preflight",
+    "creationScriptType": "standalone",
+    "webAppConfiguredAtDeployment": true,
+    "remoteCreationHiddenInsideWrapperAllowed": false,
+    "claspSyntaxMayBeInferredFromChatHistory": false,
+    "claspSyntaxMayBeInferredFromRemoteDocsWithoutLocalHelp": false,
+    "preflightCommand": "npm run clasp:preflight",
     "claspCreateRequiresOwnerApproval": true,
     "claspPushRequiresOwnerApproval": true,
     "productionDeployRequiresOwnerApproval": true,
-    "claspConfigTracked": false,
-    "restoreTrackedManifestAfterCreate": true
+    "claspConfigTracked": false
   },
   "sessionIsolation": {
     "sessionKey": "PARSA_S03",

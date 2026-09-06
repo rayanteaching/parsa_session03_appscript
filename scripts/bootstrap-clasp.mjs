@@ -14,12 +14,17 @@ function git(args, options = {}) {
   return execFileSync('git', args, { encoding: 'utf8', ...options }).trim();
 }
 
-function commandName(name) {
-  return process.platform === 'win32' ? `${name}.cmd` : name;
+function runNodeScript(scriptPath) {
+  const result = spawnSync(process.execPath, [scriptPath], { stdio: 'inherit' });
+  if (result.error) fail(`node ${scriptPath} could not start: ${result.error.message}`);
+  if (result.status !== 0) fail(`node ${scriptPath} exited with status ${result.status}`);
 }
 
-function run(name, args) {
-  const result = spawnSync(commandName(name), args, { stdio: 'inherit' });
+function runExternal(name, args) {
+  const result = spawnSync(name, args, {
+    stdio: 'inherit',
+    shell: process.platform === 'win32'
+  });
   if (result.error) fail(`${name} could not start: ${result.error.message}`);
   if (result.status !== 0) fail(`${name} ${args.join(' ')} exited with status ${result.status}`);
 }
@@ -65,12 +70,13 @@ try {
 if (!ignored) fail('.clasp.json must be Git-ignored before project creation');
 
 console.log('Running repository verification before Apps Script project creation...');
-run('npm', ['test']);
+runNodeScript('scripts/validate.mjs');
+runNodeScript('scripts/validate-bidi.mjs');
 
 console.log(`Creating Apps Script project "${PROJECT_TITLE}" from this local repository...`);
 let createSucceeded = false;
 try {
-  run('clasp', ['create', '--type', 'webapp', '--title', PROJECT_TITLE, '--rootDir', '.']);
+  runExternal('clasp', ['create', '--type', 'webapp', '--title', PROJECT_TITLE, '--rootDir', '.']);
   createSucceeded = true;
 } finally {
   try {
@@ -98,6 +104,6 @@ if (statusAfter) {
 }
 
 console.log('Apps Script target created. Local target status:');
-run('clasp', ['status']);
+runExternal('clasp', ['status']);
 console.log('PASS  Session 03 Apps Script project was created from the verified local clone.');
 console.log('STOP  No clasp push was performed. Explicit owner approval is still required before push.');

@@ -18,22 +18,24 @@
 
 Do not create Session 03 manually in the Apps Script editor. Follow `docs/APPS_SCRIPT_WORKFLOW.md`.
 
-The required sequence is:
+Required sequence:
 
-1. verify and merge the repository foundation to trusted `main`;
-2. clone this repository to a dedicated local folder on the owner workstation;
-3. switch/sync local `main` and require a clean working tree;
+1. verify foundation is on trusted `main`;
+2. use the verified local repository clone/checkout;
+3. require clean `git status --short`;
 4. run `npm test`;
 5. authenticate `clasp` for the intended Google account if needed;
-6. run `npm run bootstrap:clasp` from the repository root;
-7. verify the resulting local-only `.clasp.json`, `clasp status`, and clean tracked Git state;
-8. do **not** run `clasp push` yet.
+6. observe the installed CLI with `clasp --version` and `clasp create-script --help`;
+7. run `npm run clasp:preflight`;
+8. only after successful preflight, run the owner-visible direct `clasp create-script --type standalone ...` command documented in `docs/APPS_SCRIPT_WORKFLOW.md`;
+9. inspect `.clasp.json`, remove the temporary bootstrap directory, run `clasp status`, and require clean Git state;
+10. stop. Do not run `clasp push` yet.
 
-The bootstrap command creates the dedicated Session 03 Apps Script project through `clasp`, restores the tracked manifest, and stops before push.
+Do not substitute remembered syntax for local CLI evidence. Do not hide first-time remote creation in a Node/npm wrapper.
 
 ## Before approved `clasp push`
 
-1. work from the verified local clone of this repository, not from Apps Script editor source;
+1. work from the verified local repository, not Apps Script editor source;
 2. synchronize trusted `main`;
 3. identify the known-good Git commit SHA;
 4. confirm owner explicitly approved this specific push;
@@ -55,4 +57,4 @@ The bootstrap command creates the dedicated Session 03 Apps Script project throu
 
 ## Production deployment
 
-Production deployment is a separate gate. Do not create or update it without explicit owner approval. Deployment source must correspond to a known Git commit and flow through the verified local clone.
+Production deployment is a separate gate. Do not create or update it without explicit owner approval. Deployment source must correspond to a known Git commit and flow through the verified local repository.

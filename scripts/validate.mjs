@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
 let fail=0;
 const ok=m=>console.log('PASS '+m),bad=m=>{fail++;console.error('FAIL '+m)},read=f=>fs.readFileSync(f,'utf8');
 const required=['Code.gs','Config.gs','CopyButtons.html','DataStore.gs','EmailService.gs','Index.html','Questions.gs','Scripts.html','Styles.html','Submission.gs','TeacherTools.gs','appsscript.json','harness/project-policy.json','docs/STATUS.md','docs/RUNBOOK.md','docs/APPS_SCRIPT_WORKFLOW.md','docs/HARNESS_INCIDENTS.md','README-SETUP.txt','scripts/clasp-preflight.mjs','.gitignore'];
@@ -13,7 +14,14 @@ const aw=policy?.appsScriptWorkflow;
 const claspGuardOk=aw?.sourceOfTruth==='github_repository'&&aw?.mutationBridge==='verified_local_clone_with_clasp'&&aw?.localCloneRequired===true&&aw?.manualAppsScriptSourceEditingAllowed===false&&aw?.manualAppsScriptProjectCreationAllowed===false&&aw?.claspEnvironmentMustBeObservedBeforeProvisioning===true&&Array.isArray(aw?.requiredClaspObservations)&&aw.requiredClaspObservations.includes('clasp --version')&&aw.requiredClaspObservations.includes('clasp create-script --help')&&aw?.provisioningMode==='direct_owner_command_after_preflight'&&aw?.creationScriptType==='standalone'&&aw?.webAppConfiguredAtDeployment===true&&aw?.remoteCreationHiddenInsideWrapperAllowed===false&&aw?.claspSyntaxMayBeInferredFromChatHistory===false&&aw?.claspSyntaxMayBeInferredFromRemoteDocsWithoutLocalHelp===false&&aw?.preflightCommand==='npm run clasp:preflight'&&aw?.claspConfigTracked===false;
 claspGuardOk?ok('clasp environment-aware provisioning policy'):bad('clasp environment-aware provisioning policy');
 if(!read('.gitignore').split(/\r?\n/).includes('.clasp.json'))bad('.clasp.json is not gitignored');else ok('.clasp.json is gitignored');
-if(fs.existsSync('.clasp.json'))bad('.clasp.json must not be tracked/present in repository verification');else ok('no tracked Session 03 clasp target');
+if(fs.existsSync('.clasp.json')){
+  let tracked=false,ignored=false;
+  try{execFileSync('git',['ls-files','--error-unmatch','.clasp.json'],{stdio:'ignore'});tracked=true}catch(_){tracked=false}
+  try{execFileSync('git',['check-ignore','-q','.clasp.json'],{stdio:'ignore'});ignored=true}catch(_){ignored=false}
+  if(tracked)bad('.clasp.json must remain local-only and untracked');else ok('local .clasp.json is untracked');
+  if(!ignored)bad('local .clasp.json is not gitignored');else ok('local .clasp.json is gitignored');
+  try{const cc=JSON.parse(read('.clasp.json'));if(!String(cc.scriptId||'').trim())bad('local .clasp.json has no scriptId');else ok('local clasp target has scriptId');if(cc.rootDir!=='.')bad('local .clasp.json rootDir must be . before push');else ok('local clasp target rootDir is .')}catch(e){bad('invalid local .clasp.json: '+e.message)}
+}else ok('no local clasp target present in CI/repository checkout');
 if(fs.existsSync('scripts/bootstrap-clasp.mjs'))bad('unsafe remote bootstrap wrapper must not exist');else ok('no remote bootstrap wrapper');
 const setup=read('README-SETUP.txt');if(setup.includes('clasp --version')&&setup.includes('clasp create-script --help')&&setup.includes('npm run clasp:preflight')&&setup.includes('--type standalone'))ok('setup documents observed clasp provisioning');else bad('setup missing observed clasp provisioning');
 const workflow=read('docs/APPS_SCRIPT_WORKFLOW.md');if(workflow.includes('Do not infer create syntax')&&workflow.includes('standalone')&&workflow.includes('must not create a remote project'))ok('workflow contains clasp guardrail');else bad('workflow missing clasp guardrail');
